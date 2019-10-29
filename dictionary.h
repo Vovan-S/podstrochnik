@@ -43,7 +43,7 @@ public:
     void SetLanguage(Language);
     Language GetLanguage() const;
     void SetMap(const QMap<QString,Word>&);
-    QMap<QString,Word> GetMap() const;
+    const QMap<QString,Word>& GetMap() const;
 
     //can throw NoWord
     const Word GetWord(const QString&, InputType = Id) const noexcept(false);

@@ -24,15 +24,15 @@ public:
 
     //accessor
     void SetWord(const QString&);
-    QString GetWord() const;
+    const QString& GetWord() const;
     void SetId(const QString&);
-    QString GetId() const;
+    const QString& GetId() const;
     void SetType(Word::WordType);
     Word::WordType GetType() const;
     void SetBest(const QString&);
-    QString GetBest() const;
+    const QString& GetBest() const;
     void SetNotes(const QString&);
-    QString GetNotes() const;
+    const QString& GetNotes() const;
 
     bool operator==(const Note&) const;
     //compares only "field" word and "id"

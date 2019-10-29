@@ -31,7 +31,7 @@ void Dictionary::SetMap(const QMap<QString, Word> &m)
     m_map = m;
 }
 
-QMap<QString, Word> Dictionary::GetMap() const
+const QMap<QString, Word> &Dictionary::GetMap() const
 {
     return m_map;
 }

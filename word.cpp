@@ -15,7 +15,7 @@ void Word::SetWord(const QString &w)
     m_word = w;
 }
 
-QString Word::GetWord() const
+const QString &Word::GetWord() const
 {
     return m_word;
 }
@@ -25,7 +25,7 @@ void Word::SetKey(const QString &k)
     m_key = k;
 }
 
-QString Word::GetKey() const
+const QString &Word::GetKey() const
 {
     return m_key;
 }
@@ -35,12 +35,12 @@ void Word::SetTranslations(const QList<QPair<QStringList, Word::WordType> > &t)
     m_translations = t;
 }
 
-QList<QPair<QStringList, Word::WordType> > Word::GetTranslations() const
+const QList<QPair<QStringList, Word::WordType> >& Word::GetTranslations() const
 {
     return m_translations;
 }
 
-QStringList Word::GetTranslation(Word::WordType type) const
+const QStringList &Word::GetTranslation(Word::WordType type) const
 {
     for (auto i = m_translations.begin();i != m_translations.end();i++)
         if (i->second == type)
