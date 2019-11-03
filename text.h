@@ -11,60 +11,71 @@
 class Text
 {
 public:
-    enum SectionType
-    {
-        Paragraph, //default section
-        SubChapter,
-        Chapter,
-        Part
-    };
-    //мб замени, как будет удобнее, было бы логично первым элементом листа иметь заголовок,
-    //если section type не paragraph
-    typedef QList<QPair<SectionType,QStringList>>  TextContainer;
+  enum SectionType
+  {
+    Paragraph, // default section
+    SubChapter, // *** text ***
+    Chapter,
+    Part // bunch of chapters
+  };
+
+  typedef QPair<SectionType, QList<QStringList>> TextContainer;
+
 private:
-    QString fileName;
-    TextContainer text;
+  QStringList plainText;
+  QString fileName;
+  TextContainer text;
+  int lineLength;
+  bool sectioned = false; // whether the text is divided into sections
+
 public:
-    Text();
+  Text() {};
 
-    //max lenght of one line in characters
-    int GetLenght() const;
-    void SetLenght(int);
+  //max lenght of one line in characters
+  int GetLength() const;
+  void SetLength( int );
 
-    //saves in file or reads from file
-    void SetFileName(const QString&);
-    const QString& GetFileName() const;
-    void WriteFile() const;
-    void ReadFile();
+  //saves in file or reads from file
+  void SetFileName( const QString& );
+  const QString& GetFileName() const;
+  void WriteFile() const noexcept(false);
+  void ReadFile() noexcept(false);
 
-    //text without any sections
-    void SetPlainText(const QStringList&);
+  //text without any sections
+  void SetPlainText( const QStringList& ) noexcept(false); // LengthExc
 
-    //accessors
-    void SetText(const TextContainer&);
-    const TextContainer& GetText() const;
-    const QString& GetLine(int) const;
-    void SetLine(int, const QString&);
-    QString& rLine(int);
-    //caption of paragraph is its number
-    QStringList& rSection(SectionType, const QString& caption);
-    const QStringList& GetSection(SectionType, const QString& caption) const;
-    //replacing text of one section
-    void SetSection(SectionType,const QString& caption,const QStringList& text);
-    void SetCaption(SectionType, const QString& old_caption, const QString& new_caption);
-    //caption of n-th section
-    const QString& GetCaption(int) const;
-    //caption of n-th section of this type
-    const QString& GetCaption(SectionType, int) const;
+  //accessors
+  void SetText( const TextContainer& container );
+  const TextContainer& GetText() const;
+  const QString& GetLine( int line ) const noexcept(false); // OutOfBoundaries
+  void SetLine( int line, const QString& ) noexcept(false); // OutOfBoundaries
+  QString& rLine( int line ) noexcept(false);  // OutOfBoundaries
 
-    //dividing text in sections: breaks line with number "line" at "pos" char
-    //starts new section of given type with given caption with rest of line
-    void Divide(int line, int pos, SectionType, const QString& caption);
+  //caption of paragraph is its number
+  QStringList& rSection( SectionType, const QString& );
+  const QStringList& GetSection( SectionType, const QString& ) const;
 
-    void LineBreak(int line, int pos);
+  //replacing text of one section
+  void SetSection( SectionType, const QString&, const QStringList& );
+  void SetCaption( SectionType, const QString&, const QString& );
 
-    void DeleteSection(SectionType, const QString& caprion);
-    void DeleteString(int);
- };
+  //caption of n-th section
+  const QString& GetCaption( int ) const;
+
+  //caption of n-th section of this type
+  const QString& GetCaption( SectionType, int ) const;
+
+  //dividing text in sections: breaks line with number "line" at "pos" char
+  //starts new section of given type with given caption with rest of line
+  void Divide( int line, int pos, SectionType, const QString& caption );
+  void LineBreak( int line, int pos );
+  void DeleteSection( SectionType section, const QString& caption );
+  void DeleteString( int line ) noexcept(false); // OutOfBoundaries
+
+
+  bool operator==( const Text& text ) const;
+  void operator=( const Text& text );
+
+};
 
 #endif // TEXT_H
