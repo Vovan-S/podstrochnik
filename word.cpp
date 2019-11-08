@@ -1,5 +1,17 @@
 #include "word.h"
 
+const QString Word::wordSeparator        = "__W:";
+const QString Word::typeSeparator        = "__Ty:";
+const QString Word::translationSeparator = "__Tr:";
+
+
+bool Word::hasSeparators(const QString &s)
+{
+    if (s.contains(wordSeparator) || s.contains(translationSeparator) || s.contains(typeSeparator))
+        return true;
+    else return false;
+}
+
 Word::Word()
 {
 
@@ -15,7 +27,7 @@ void Word::SetWord(const QString &w)
     m_word = w;
 }
 
-QString Word::GetWord() const
+const QString &Word::GetWord() const
 {
     return m_word;
 }
@@ -25,7 +37,7 @@ void Word::SetKey(const QString &k)
     m_key = k;
 }
 
-QString Word::GetKey() const
+const QString &Word::GetKey() const
 {
     return m_key;
 }
@@ -35,12 +47,12 @@ void Word::SetTranslations(const QList<QPair<QStringList, Word::WordType> > &t)
     m_translations = t;
 }
 
-QList<QPair<QStringList, Word::WordType> > Word::GetTranslations() const
+const QList<QPair<QStringList, Word::WordType> >& Word::GetTranslations() const
 {
     return m_translations;
 }
 
-QStringList Word::GetTranslation(Word::WordType type) const
+const QStringList &Word::GetTranslation(Word::WordType type) const
 {
     for (auto i = m_translations.begin();i != m_translations.end();i++)
         if (i->second == type)
@@ -54,13 +66,13 @@ void Word::AddTranslation(const QStringList &translation, Word::WordType type)
         if (i->second == type)
         {
             foreach (QString s, translation) {
-               //если такого перевода еще нет
+               //there is such part of speech
                if(!(i->first.contains(s)))
                     i->first << s;
             }
             return;
         }
-    //такой части речи еще нет
+    //there is no such part of speech
     m_translations << QPair<QStringList, Word::WordType>(translation,type);
 }
 
@@ -98,3 +110,42 @@ bool Word::operator==(const Word &w) const
         return true;
 }
 
+
+QTextStream &operator<<(QTextStream & s, const Word & w)
+{
+    s << w.GetKey() << Word::wordSeparator << w.GetWord();
+    for (auto i = w.GetTranslations().begin();i != w.GetTranslations().end();i++)
+    {
+        s << Word::typeSeparator << i->second << Word::translationSeparator;
+        s << i->first.join(Word::translationSeparator);
+    }
+    s << "\n";
+    return s;
+}
+
+QTextStream &operator>>(QTextStream &s, Word &w)
+{
+    QString str = s.readLine();
+    //reads from lines chars from "from" to "end"
+    int start = 0;
+    int end = str.indexOf(Word::wordSeparator);
+    w.SetKey(str.left(end));
+    start = end + Word::wordSeparator.length();
+    end = str.indexOf(Word::typeSeparator,start);
+    w.SetWord(str.mid(start, end - start));
+    Word::container_t list;
+    while(end > 0)
+    {
+        start = end + Word::typeSeparator.length();
+        end = str.indexOf(Word::translationSeparator,start);
+        Word::WordType t = static_cast<Word::WordType>(str.mid(start,end-start).toInt());
+        start = end + Word::translationSeparator.length();
+        end = str.indexOf(Word::typeSeparator,start);
+        if (end < 0)
+            list << Word::container_value_t(str.mid(start).split(Word::translationSeparator),t);
+        else
+            list << Word::container_value_t(str.mid(start, end - start).split(Word::translationSeparator),t);
+    }
+    w.SetTranslations(list);
+    return s;
+}
